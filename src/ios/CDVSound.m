@@ -253,7 +253,8 @@
 
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command
 {
-    NSString* callbackId = command.callbackId;
+    [self.commandDelegate runInBackground:^{
+        NSString* callbackId = command.callbackId;
 
 #pragma unused(callbackId)
     NSString* mediaId = [command argumentAtIndex:0];
