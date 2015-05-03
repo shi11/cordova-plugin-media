@@ -331,6 +331,7 @@
     }
     // else audioFile was nil - error already returned from audioFile for resource
     return;
+    }];
 }
 
 - (BOOL)prepareToPlay:(CDVAudioFile*)audioFile withId:(NSString*)mediaId
