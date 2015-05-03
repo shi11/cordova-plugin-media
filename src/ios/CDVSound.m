@@ -427,33 +427,35 @@
 
 - (void)seekToAudio:(CDVInvokedUrlCommand*)command
 {
-    // args:
-    // 0 = Media id
-    // 1 = path to resource
-    // 2 = seek to location in milliseconds
+    [self.commandDelegate runInBackground:^{
+        // args:
+        // 0 = Media id
+        // 1 = path to resource
+        // 2 = seek to location in milliseconds
 
-    NSString* mediaId = [command argumentAtIndex:0];
+        NSString* mediaId = [command argumentAtIndex:0];
 
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-    double position = [[command argumentAtIndex:1] doubleValue];
+        CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+        double position = [[command argumentAtIndex:1] doubleValue];
 
-    if ((audioFile != nil) && (audioFile.player != nil)) {
-        NSString* jsString;
-        double posInSeconds = position / 1000;
-        if (posInSeconds >= audioFile.player.duration) {
-            // The seek is past the end of file.  Stop media and reset to beginning instead of seeking past the end.
-            [audioFile.player stop];
-            audioFile.player.currentTime = 0;
-            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, 0.0, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
-            // NSLog(@"seekToEndJsString=%@",jsString);
-        } else {
-            audioFile.player.currentTime = posInSeconds;
-            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%f);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, posInSeconds];
-            // NSLog(@"seekJsString=%@",jsString);
+        if ((audioFile != nil) && (audioFile.player != nil)) {
+            NSString* jsString;
+            double posInSeconds = position / 1000;
+            if (posInSeconds >= audioFile.player.duration) {
+                // The seek is past the end of file.  Stop media and reset to beginning instead of seeking past the end.
+                [audioFile.player stop];
+                audioFile.player.currentTime = 0;
+                jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, 0.0, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
+                // NSLog(@"seekToEndJsString=%@",jsString);
+            } else {
+                audioFile.player.currentTime = posInSeconds;
+                jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%f);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, posInSeconds];
+                // NSLog(@"seekJsString=%@",jsString);
+            }
+
+            [self.commandDelegate evalJs:jsString];
         }
-
-        [self.commandDelegate evalJs:jsString];
-    }
+    }];
 }
 
 - (void)release:(CDVInvokedUrlCommand*)command
