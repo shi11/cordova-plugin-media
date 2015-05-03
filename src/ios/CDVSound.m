@@ -399,6 +399,7 @@
         }  // ignore if no media playing
         if (jsString) {
             [self.commandDelegate evalJs:jsString];
+        }
     }];
 }
 
