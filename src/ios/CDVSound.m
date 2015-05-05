@@ -249,7 +249,7 @@
             avPlayer = [[AVPlayer alloc] initWithURL:resourceUrl];
         }
 
-        self.currMediaId = audioFile.player.mediaId;
+        self.currMediaId = mediaId;
 
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -305,7 +305,9 @@
             bError = [self prepareToPlay:audioFile withId:mediaId];
         }
         if (!bError) {
-            self.currMediaId = audioFile.player.mediaId;
+            //self.currMediaId = audioFile.player.mediaId;
+            self.currMediaId = mediaId;
+
             // audioFile.player != nil  or player was successfully created
             // get the audioSession and set the category to allow Playing when device is locked or ring/silent switch engaged
 
@@ -753,8 +755,8 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer*)player successfully:(BOOL)flag
 {
-    CDVAudioPlayer* aPlayer = (CDVAudioPlayer*)player;
-    NSString* mediaId = aPlayer.mediaId;
+    //    CDVAudioPlayer* aPlayer = (CDVAudioPlayer*)player;
+    NSString* mediaId = self.currMediaId;
     CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
     NSString* jsString = nil;
 
