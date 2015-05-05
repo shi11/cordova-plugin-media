@@ -441,10 +441,8 @@
     } else {
         audioFile.player.mediaId = mediaId;
         audioFile.player.delegate = self;
-        bError = ![audioFile.player prepareToPlay];
-        if (avPlayer == nil) {
-+           bError = ![audioFile.player prepareToPlay];
-        }
+        if (avPlayer == nil)
+            bError = ![audioFile.player prepareToPlay];
     }
     return bError;
 }
