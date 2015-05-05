@@ -476,7 +476,8 @@
         if (audioFile != nil && ((audioFile.player != nil) || (avPlayer != nil))) {
             if (audioFile.player != nil) {
                 [audioFile.player pause];
-            } else if (avPlayer != nil) {
+            }
+            if (avPlayer != nil) {
                 [avPlayer pause];
             }
             NSLog(@"Paused playing audio sample '%@'", audioFile.resourcePath);
@@ -613,17 +614,23 @@
         NSMutableDictionary *songInfo = [[NSMutableDictionary alloc] init];
         [songInfo setObject:title forKey:MPMediaItemPropertyTitle];
         [songInfo setObject:artist forKey:MPMediaItemPropertyArtist];
-        [songInfo setObject:album forKey:MPMediaItemPropertyAlbumTitle];
+        // we don't need to show the album: [songInfo setObject:album forKey:MPMediaItemPropertyAlbumTitle];
         [songInfo setObject:duration forKey:MPMediaItemPropertyPlaybackDuration];
-      
-        NSString *currentpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+        
+        NSLog(@"Image URL '%@'", pathToCover);
+        
+        /* for local files: NSString *currentpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
         currentpath = [NSString stringWithFormat:@"%@/files/%@", currentpath, pathToCover];
         
-        UIImage *albumArtImage = [UIImage imageWithContentsOfFile:currentpath];
+        UIImage *albumArtImage = [UIImage imageWithContentsOfFile:pathToCover]; */
+
+        // for urls
+        UIImage *albumArtImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:pathToCover]]];
+        
         if (albumArtImage == nil) {
             // create from default image
             NSString *bundlePath = [[NSBundle mainBundle] resourcePath];
-            NSString *defaultPathToCover = [NSString stringWithFormat:@"%@/www/images/iosDefaultMediaCover.png", bundlePath];
+            NSString *defaultPathToCover = [NSString stringWithFormat:@"%@/www/img/lockscreen-soundwave.png", bundlePath];
 
             albumArtImage = [UIImage imageWithContentsOfFile:defaultPathToCover];
         }
