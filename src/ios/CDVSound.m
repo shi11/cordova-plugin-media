@@ -220,7 +220,7 @@
 {
     NSDictionary *dictionary = [notification userInfo];
     
-    NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",\"%@\");", @"cordova.require('org.apache.cordova.media.Media').onRemoteControlPressed", self.currMediaId, [[dictionary allKeys] firstObject]];
+    NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",\"%@\");", @"cordova.require('cordova-plugin-media.Media').onRemoteControlPressed", self.currMediaId, [[dictionary allKeys] firstObject]];
     [self.commandDelegate evalJs:jsString];
 }
 
@@ -515,11 +515,11 @@
                     // The seek is past the end of file.  Stop media and reset to beginning instead of seeking past the end.
                     [audioFile.player stop];
                     audioFile.player.currentTime = 0;
-                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_POSITION, 0.0, @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
+                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, 0.0, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
                     // NSLog(@"seekToEndJsString=%@",jsString);
                 } else {
                     audioFile.player.currentTime = posInSeconds;
-                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%f);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_POSITION, posInSeconds];
+                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%f);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, posInSeconds];
                     // NSLog(@"seekJsString=%@",jsString);
                 }
     
@@ -800,7 +800,7 @@
     // Will be called when AVPlayer finishes playing playerItem
     NSString* mediaId = self.currMediaId;
     NSString* jsString = nil;
-    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
+    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
     [self.commandDelegate evalJs:jsString];
 }
 
