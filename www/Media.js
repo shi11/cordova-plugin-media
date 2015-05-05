@@ -133,6 +133,17 @@ Media.prototype.getCurrentPosition = function(success, fail) {
 };
 
 /**
+ * Get duration of audio for AVPlayer
+ */
+Media.prototype.getDurationAV = function(success, fail) {
+    var me = this;
+    exec(function(p) {
+        me._duration = p;
+        success(p);
+    }, fail, "Media", "getDurationAV", [this.id]);
+};
+
+/**
  * Start recording audio file.
  */
 Media.prototype.startRecord = function() {

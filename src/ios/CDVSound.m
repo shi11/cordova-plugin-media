@@ -548,6 +548,7 @@
     }];
 }
 
+
 - (void)release:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
@@ -570,6 +571,28 @@
                 NSLog(@"Media with id %@ released", mediaId);
             }
         }
+    }];
+}
+
+- (void)getDurationAV:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+    NSString* callbackId = command.callbackId;
+    NSString* mediaId = [command argumentAtIndex:0];
+
+#pragma unused(mediaId)
+    int32_t duration = -1;
+
+    if (avPlayer) {
+        int32_t timeScale = avPlayer.currentItem.asset.duration.timescale;
+    }
+    
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:duration];
+    
+    NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_POSITION, duration];
+    [self.commandDelegate evalJs:jsString];
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+
     }];
 }
 
@@ -616,8 +639,6 @@
         [songInfo setObject:artist forKey:MPMediaItemPropertyArtist];
         // we don't need to show the album: [songInfo setObject:album forKey:MPMediaItemPropertyAlbumTitle];
         [songInfo setObject:duration forKey:MPMediaItemPropertyPlaybackDuration];
-        
-        NSLog(@"Image URL '%@'", pathToCover);
         
         /* for local files: NSString *currentpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
         currentpath = [NSString stringWithFormat:@"%@/files/%@", currentpath, pathToCover];
