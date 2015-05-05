@@ -454,14 +454,9 @@
         CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
         NSString* jsString = nil;
 
-        if (audioFile != nil && ((audioFile.player != nil) || (avPlayer != nil))) {
-            if (audioFile.player != nil) {
-                [audioFile.player pause];
-            } else if (avPlayer != nil) {
-                [avPlayer pause];
-            }
+        if ((audioFile != nil) && (audioFile.player != nil)) {
             NSLog(@"Stopped playing audio sample '%@'", audioFile.resourcePath);
-            
+            [audioFile.player stop];
             audioFile.player.currentTime = 0;
             jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
         }  // ignore if no media playing
@@ -478,10 +473,15 @@
         NSString* jsString = nil;
         CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
-        if ((audioFile != nil) && (audioFile.player != nil)) {
+        if (audioFile != nil && ((audioFile.player != nil) || (avPlayer != nil))) {
+            if (audioFile.player != nil) {
+                [audioFile.player pause];
+            } else if (avPlayer != nil) {
+                [avPlayer pause];
+            }
             NSLog(@"Paused playing audio sample '%@'", audioFile.resourcePath);
-            [audioFile.player pause];
-            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_PAUSED];
+
+            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_PAUSED];
         }
         // ignore if no media playing
 
