@@ -605,7 +605,7 @@
     NSString* album = [command.arguments objectAtIndex:2];
     NSString* artist = [command.arguments objectAtIndex:3];
     NSString* pathToCover = [command.arguments objectAtIndex:4];
-    NSNumber* duration = [command.arguments objectAtIndex:5 withDefault:[NSNumber numberWithFloat:1.0]];
+    NSNumber* duration = [command.arguments objectAtIndex:5];
     
 
     if ([MPNowPlayingInfoCenter class])  {
