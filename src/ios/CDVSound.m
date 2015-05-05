@@ -349,11 +349,15 @@
                     if (audioFile.volume != nil) {
                         audioFile.player.volume = [audioFile.volume floatValue];
                     }
-                    
                     [audioFile.player play];
-                    position = round(audioFile.player.duration * 1000) / 1000;
-                    
+                    position = audioFile.player.currentTime;    
                 }
+
+                position = round(position * 1000) / 1000;
+                MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
+                NSMutableDictionary *playingInfo = [NSMutableDictionary dictionaryWithDictionary:center.nowPlayingInfo];
+                [playingInfo setObject:[NSNumber numberWithFloat:position] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+                center.nowPlayingInfo = playingInfo;
                 jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_DURATION, position, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_RUNNING];
                 [self.commandDelegate evalJs:jsString];
             }
@@ -511,16 +515,19 @@
                 }
     
             } else if (avPlayer != nil) {
-                CMTime time = [avPlayer currentTime];
-                double currPosition = CMTimeGetSeconds(time);
-                
                 int32_t timeScale = avPlayer.currentItem.asset.duration.timescale;
                 CMTime timeToSeek = CMTimeMakeWithSeconds(posInSeconds, timeScale);
+                // update info on the lock screen
+
+
+
+                BOOL isPlaying = (avPlayer.rate > 0 && !avPlayer.error);
+
                 [avPlayer seekToTime: timeToSeek
                              toleranceBefore: kCMTimeZero
                               toleranceAfter: kCMTimeZero
                            completionHandler: ^(BOOL finished) {
-                               // [avPlayer play];
+                               if (isPlaying) [avPlayer play];
                            }];
             }
             MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
