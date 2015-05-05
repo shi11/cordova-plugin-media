@@ -520,9 +520,13 @@
                              toleranceBefore: kCMTimeZero
                               toleranceAfter: kCMTimeZero
                            completionHandler: ^(BOOL finished) {
-                               [avPlayer play];
+                               // [avPlayer play];
                            }];
             }
+            MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
+            NSMutableDictionary *playingInfo = [NSMutableDictionary dictionaryWithDictionary:center.nowPlayingInfo];
+            [playingInfo setObject:[NSNumber numberWithFloat:posInSeconds] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+            center.nowPlayingInfo = playingInfo;
 
             [self.commandDelegate evalJs:jsString];
         }
