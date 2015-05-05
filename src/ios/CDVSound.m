@@ -19,12 +19,37 @@
 
 #import "CDVSound.h"
 #import "CDVFile.h"
+#import <MediaPlayer/MPNowPlayingInfoCenter.h>
+#import <MediaPlayer/MPMediaItem.h>
+#import <AVFoundation/AVFoundation.h>
+
+#import <CommonCrypto/CommonDigest.h>
 
 #define DOCUMENTS_SCHEME_PREFIX @"documents://"
 #define HTTP_SCHEME_PREFIX @"http://"
 #define HTTPS_SCHEME_PREFIX @"https://"
 #define CDVFILE_PREFIX @"cdvfile://"
 #define RECORDING_WAV @"wav"
+
+
+@interface NSString (MD5_Hash)
++ (NSString *) md5String:(NSString*)concat;
+@end
+
+@implementation NSString (MD5_Hash)
+
++ (NSString *) md5String:(NSString*)concat {
+    const char *concat_str = [concat UTF8String];
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(concat_str, strlen(concat_str), result);
+    NSMutableString *hash = [NSMutableString string];
+    for (int i = 0; i < 16; i++)
+        [hash appendFormat:@"%02X", result[i]];
+    return [hash lowercaseString];
+}
+
+@end
+
 
 @implementation CDVSound
 
@@ -212,8 +237,36 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+- (void)handleRemoteControlEvents:(NSNotification *)notification //use notification method and logic
+{
+    NSDictionary *dictionary = [notification userInfo];
+    NSString *pauseKey = @"MP_PAUSE";
+    NSString *playKey = @"MP_PLAY";
+    NSString *stopKey = @"MP_STOP";
+    NSString *nextKey = @"MP_NEXT";
+    NSString *previousKey = @"MP_PREVIOUS";
+    NSString *positionKey = @"MP_POSITION";
+    
+    NSString *pauseValue = [dictionary valueForKey:pauseKey];
+    NSString *playValue = [dictionary valueForKey:playKey];
+    NSString *stopValue = [dictionary valueForKey:stopKey];
+    NSString *nextValue = [dictionary valueForKey:nextKey];
+    NSString *previousValue = [dictionary valueForKey:previousKey];
+    NSString *positionValue = [dictionary valueForKey:positionKey];
+    
+    NSLog(@"%@ %@ %@ %@ %@ %@", pauseValue, playValue, stopValue, nextValue, previousValue, positionValue);
+}
+
 - (void)create:(CDVInvokedUrlCommand*)command
 {
+    NSString *notificationName = @"MP_CONTROL_EVENTS";
+    
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(handleRemoteControlEvents:)
+     name:notificationName
+     object:nil];
+
     NSString* mediaId = [command argumentAtIndex:0];
     NSString* resourcePath = [command argumentAtIndex:1];
 

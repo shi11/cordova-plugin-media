@@ -153,6 +153,13 @@ Media.prototype.setVolume = function(volume) {
 };
 
 /**
+ * Set lockscreen info.
+ */
+Media.prototype.setLockScreenInfo = function(title, album, artist, pathToCover, duration) {
+    exec(null, this.errorCallback, "Media", "setLockScreenInfo", [this.id, title, album, artist, pathToCover, duration]);
+};
+
+/**
  * Audio has status update.
  * PRIVATE
  *
