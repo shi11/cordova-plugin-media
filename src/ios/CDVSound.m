@@ -581,10 +581,10 @@
     NSString* mediaId = [command argumentAtIndex:0];
 
 #pragma unused(mediaId)
-    int32_t duration = -1;
+    Float64 duration = -1;
 
     if (avPlayer) {
-        int32_t timeScale = avPlayer.currentItem.asset.duration.timescale;
+        duration = CMTimeGetSeconds(avPlayer.currentItem.duration);
     }
     
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:duration];
@@ -595,6 +595,7 @@
 
     }];
 }
+
 
 - (void)getCurrentPositionAudio:(CDVInvokedUrlCommand*)command
 {
@@ -625,6 +626,7 @@
 
 - (void)setLockScreenInfo:(CDVInvokedUrlCommand*)command
 {
+    [self.commandDelegate runInBackground:^{
     NSString* title = [command.arguments objectAtIndex:1];
     NSString* album = [command.arguments objectAtIndex:2];
     NSString* artist = [command.arguments objectAtIndex:3];
@@ -660,6 +662,7 @@
 
         [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = songInfo;
     }
+    }];
 }
 
 - (void)startRecordingAudio:(CDVInvokedUrlCommand*)command
