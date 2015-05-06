@@ -21,6 +21,9 @@
 #import "CDVFile.h"
 #import <MediaPlayer/MPNowPlayingInfoCenter.h>
 #import <MediaPlayer/MPMediaItem.h>
+#import <MediaPlayer/MPRemoteCommandCenter.h>
+#import <MediaPlayer/MPRemoteCommandEvent.h>
+#import <MediaPlayer/MPRemoteCommand.h>
 #import <AVFoundation/AVFoundation.h>
 
 #define DOCUMENTS_SCHEME_PREFIX @"documents://"
@@ -216,24 +219,9 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
-- (void)handleRemoteControlEvents:(NSNotification *)notification //use notification method and logic
-{
-    NSDictionary *dictionary = [notification userInfo];
-    
-    NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",\"%@\");", @"cordova.require('cordova-plugin-media.Media').onRemoteControlPressed", self.currMediaId, [[dictionary allKeys] firstObject]];
-    [self.commandDelegate evalJs:jsString];
-}
-
 - (void)create:(CDVInvokedUrlCommand*)command
 {   
     [self.commandDelegate runInBackground:^{
-    NSString *notificationName = @"MP_CONTROL_EVENTS";
-    
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(handleRemoteControlEvents:)
-     name:notificationName
-     object:nil];
 
     NSString* mediaId = [command argumentAtIndex:0];
     NSString* resourcePath = [command argumentAtIndex:1];
@@ -291,6 +279,31 @@
     }];
 }
 
+-(void) playEvent: (MPRemoteCommandEvent *) remoteEvent
+{
+    if (nowPlayingId) {
+        //NSLog(@"Play - Remote Event");
+        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 10];
+        [self.commandDelegate evalJs:jsString];
+    }
+}
+
+-(void) pauseEvent: (MPRemoteCommandEvent *) remoteEvent
+{   if (nowPlayingId) {
+        //NSLog(@"Paused - Remote Event");
+        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 11];
+        [self.commandDelegate evalJs:jsString];
+    }
+}
+
+-(void) nextTrackEvent: (MPRemoteCommandEvent *) remoteEvent
+{   if (nowPlayingId) {
+        //NSLog(@"Next - Remote Event");
+        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 12];
+        [self.commandDelegate evalJs:jsString];
+    }
+}
+
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command
 {
 
@@ -299,6 +312,20 @@
         if (!isBeginReceiveRemoteControlsSet) {
             [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
             isBeginReceiveRemoteControlsSet = TRUE;
+            
+            MPRemoteCommandCenter *rcc = [MPRemoteCommandCenter sharedCommandCenter];
+            
+            MPRemoteCommand *playCommand = [rcc playCommand];
+            [playCommand setEnabled:YES];
+            [playCommand addTarget:self action:@selector(playEvent:)];
+            
+            MPRemoteCommand *pauseCommand = [rcc pauseCommand];
+            [pauseCommand setEnabled:YES];
+            [pauseCommand addTarget:self action:@selector(pauseEvent:)];
+            
+            MPRemoteCommand *nextTrackCommand = [rcc nextTrackCommand];
+            [nextTrackCommand setEnabled:YES];
+            [nextTrackCommand addTarget:self action:@selector(nextTrackEvent:)];
         }
 
         NSString* callbackId = command.callbackId;
@@ -630,6 +657,7 @@
 - (void)setLockScreenInfo:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
+    nowPlayingId = [command argumentAtIndex:0];
     NSString* title = [command.arguments objectAtIndex:1];
     NSString* album = [command.arguments objectAtIndex:2];
     NSString* artist = [command.arguments objectAtIndex:3];

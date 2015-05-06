@@ -84,6 +84,7 @@ typedef NSUInteger CDVMediaMsg;
 {
     NSMutableDictionary* soundCache;
     NSString* currMediaId;
+    NSString* nowPlayingId;
     AVAudioSession* avSession;
     BOOL isBeginReceiveRemoteControlsSet;
     AVPlayer* avPlayer;
