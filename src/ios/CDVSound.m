@@ -226,6 +226,7 @@
 
 - (void)create:(CDVInvokedUrlCommand*)command
 {   
+    [self.commandDelegate runInBackground:^{
     NSString *notificationName = @"MP_CONTROL_EVENTS";
     
     [[NSNotificationCenter defaultCenter]
@@ -263,6 +264,7 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }
+    }];
 }
 
 - (void)setVolume:(CDVInvokedUrlCommand*)command
@@ -291,13 +293,14 @@
 
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command
 {
-    // this code necessary for queue playing in background mode
-    if (!isBeginReceiveRemoteControlsSet) {
-        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-        isBeginReceiveRemoteControlsSet = TRUE;
-    }
 
     [self.commandDelegate runInBackground:^{
+        // this code necessary for queue playing in background mode
+        if (!isBeginReceiveRemoteControlsSet) {
+            [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+            isBeginReceiveRemoteControlsSet = TRUE;
+        }
+
         NSString* callbackId = command.callbackId;
 
 #pragma unused(callbackId)
