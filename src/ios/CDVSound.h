@@ -94,7 +94,6 @@ typedef NSUInteger CDVMediaMsg;
 @property (nonatomic, strong) NSString* currMediaId;
 
 
-- (void)handleRemoteControlEvents:(NSNotification *)notification;
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command;
 - (void)pausePlayingAudio:(CDVInvokedUrlCommand*)command;
 - (void)stopPlayingAudio:(CDVInvokedUrlCommand*)command;
