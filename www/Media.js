@@ -37,7 +37,7 @@ var mediaObjects = {};
  * @param statusCallback        The callback to be called when media status has changed.
  *                                  statusCallback(int statusCode) - OPTIONAL
  */
-var Media = function(src, successCallback, errorCallback, statusCallback, remoteControlsCallback) {
+var Media = function(src, successCallback, errorCallback, statusCallback) {
     argscheck.checkArgs('sFFF', 'Media', arguments);
     this.id = utils.createUUID();
     mediaObjects[this.id] = this;
@@ -45,7 +45,6 @@ var Media = function(src, successCallback, errorCallback, statusCallback, remote
     this.successCallback = successCallback;
     this.errorCallback = errorCallback;
     this.statusCallback = statusCallback;
-    this.remoteControlsCallback = remoteControlsCallback;
     this._duration = -1;
     this._position = -1;
     exec(null, this.errorCallback, "Media", "create", [this.id, this.src]);
@@ -65,12 +64,6 @@ Media.MEDIA_PAUSED = 3;
 Media.MEDIA_STOPPED = 4;
 Media.MEDIA_MSG = ["None", "Starting", "Running", "Paused", "Stopped"];
 
-// Remote control
-Media.REMOTE_CONTROL_PAUSE = "MP_PAUSE";
-Media.REMOTE_CONTROL_PLAY = "MP_PLAY";
-Media.REMOTE_CONTROL_STOP = "MP_STOP";
-Media.REMOTE_CONTROL_NEXT = "MP_NEXT";
-Media.REMOTE_CONTROL_PREVIOUS = "MP_PREVIOUS";
 
 // "static" function to return existing objs.
 Media.get = function(id) {
@@ -218,18 +211,6 @@ Media.onStatus = function(id, msgType, value) {
 
 };
 
-Media.onRemoteControlPressed = function(id, remoteControl) {               
-    var media = mediaObjects[id];
-               
-    if(media) {
-        media.remoteControlPressed(remoteControl);
-    }
-       
-};
-               
-Media.prototype.remoteControlPressed = function(remoteControl) {
-    this.remoteControlsCallback(remoteControl);
-};
 
 module.exports = Media;
 
