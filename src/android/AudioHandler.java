@@ -75,72 +75,76 @@ public class AudioHandler extends CordovaPlugin {
         PluginResult.Status status = PluginResult.Status.OK;
         String result = "";
 
-        if (action.equals("startRecordingAudio")) {
-            String target = args.getString(1);
-            String fileUriStr;
-            try {
-                Uri targetUri = resourceApi.remapUri(Uri.parse(target));
-                fileUriStr = targetUri.toString();
-            } catch (IllegalArgumentException e) {
-                fileUriStr = target;
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                if (action.equals("startRecordingAudio")) {
+                    String target = args.getString(1);
+                    String fileUriStr;
+                    try {
+                        Uri targetUri = resourceApi.remapUri(Uri.parse(target));
+                        fileUriStr = targetUri.toString();
+                    } catch (IllegalArgumentException e) {
+                        fileUriStr = target;
+                    }
+                    this.startRecordingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr));
+                }
+                else if (action.equals("stopRecordingAudio")) {
+                    this.stopRecordingAudio(args.getString(0));
+                }
+                else if (action.equals("startPlayingAudio")) {
+                    String target = args.getString(1);
+                    String fileUriStr;
+                    try {
+                        Uri targetUri = resourceApi.remapUri(Uri.parse(target));
+                        fileUriStr = targetUri.toString();
+                    } catch (IllegalArgumentException e) {
+                        fileUriStr = target;
+                    }
+                    this.startPlayingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr));
+                }
+                else if (action.equals("seekToAudio")) {
+                    this.seekToAudio(args.getString(0), args.getInt(1));
+                }
+                else if (action.equals("pausePlayingAudio")) {
+                    this.pausePlayingAudio(args.getString(0));
+                }
+                else if (action.equals("stopPlayingAudio")) {
+                    this.stopPlayingAudio(args.getString(0));
+                } else if (action.equals("setVolume")) {
+                   try {
+                       this.setVolume(args.getString(0), Float.parseFloat(args.getString(1)));
+                   } catch (NumberFormatException nfe) {
+                       //no-op
+                   }
+                } else if (action.equals("getCurrentPositionAudio")) {
+                    float f = this.getCurrentPositionAudio(args.getString(0));
+                    callbackContext.sendPluginResult(new PluginResult(status, f));
+                    return true;
+                }
+                else if (action.equals("getDurationAudio")) {
+                    float f = this.getDurationAudio(args.getString(0), args.getString(1));
+                    callbackContext.sendPluginResult(new PluginResult(status, f));
+                    return true;
+                }
+                else if (action.equals("create")) {
+                    String id = args.getString(0);
+                    String src = FileHelper.stripFileProtocol(args.getString(1));
+                    getOrCreatePlayer(id, src);
+                }
+                else if (action.equals("release")) {
+                    boolean b = this.release(args.getString(0));
+                    callbackContext.sendPluginResult(new PluginResult(status, b));
+                    return true;
+                }
+                else if (action.equals("messageChannel")) {
+                    messageChannel = callbackContext;
+                    return true;
+                }
+                else { // Unrecognized action.
+                    return false;
+                }
             }
-            this.startRecordingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr));
-        }
-        else if (action.equals("stopRecordingAudio")) {
-            this.stopRecordingAudio(args.getString(0));
-        }
-        else if (action.equals("startPlayingAudio")) {
-            String target = args.getString(1);
-            String fileUriStr;
-            try {
-                Uri targetUri = resourceApi.remapUri(Uri.parse(target));
-                fileUriStr = targetUri.toString();
-            } catch (IllegalArgumentException e) {
-                fileUriStr = target;
-            }
-            this.startPlayingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr));
-        }
-        else if (action.equals("seekToAudio")) {
-            this.seekToAudio(args.getString(0), args.getInt(1));
-        }
-        else if (action.equals("pausePlayingAudio")) {
-            this.pausePlayingAudio(args.getString(0));
-        }
-        else if (action.equals("stopPlayingAudio")) {
-            this.stopPlayingAudio(args.getString(0));
-        } else if (action.equals("setVolume")) {
-           try {
-               this.setVolume(args.getString(0), Float.parseFloat(args.getString(1)));
-           } catch (NumberFormatException nfe) {
-               //no-op
-           }
-        } else if (action.equals("getCurrentPositionAudio")) {
-            float f = this.getCurrentPositionAudio(args.getString(0));
-            callbackContext.sendPluginResult(new PluginResult(status, f));
-            return true;
-        }
-        else if (action.equals("getDurationAudio")) {
-            float f = this.getDurationAudio(args.getString(0), args.getString(1));
-            callbackContext.sendPluginResult(new PluginResult(status, f));
-            return true;
-        }
-        else if (action.equals("create")) {
-            String id = args.getString(0);
-            String src = FileHelper.stripFileProtocol(args.getString(1));
-            getOrCreatePlayer(id, src);
-        }
-        else if (action.equals("release")) {
-            boolean b = this.release(args.getString(0));
-            callbackContext.sendPluginResult(new PluginResult(status, b));
-            return true;
-        }
-        else if (action.equals("messageChannel")) {
-            messageChannel = callbackContext;
-            return true;
-        }
-        else { // Unrecognized action.
-            return false;
-        }
+        });
 
         callbackContext.sendPluginResult(new PluginResult(status, result));
 
