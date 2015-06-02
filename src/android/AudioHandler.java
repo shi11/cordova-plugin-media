@@ -72,8 +72,6 @@ public class AudioHandler extends CordovaPlugin {
      */
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         final CordovaResourceApi resourceApi = webView.getResourceApi();
-        final PluginResult.Status status = PluginResult.Status.OK;
-        final String result = "";
 
         if (action.equals("startRecordingAudio")) {
             final String target = args.getString(1);
@@ -87,8 +85,12 @@ public class AudioHandler extends CordovaPlugin {
                     } catch (IllegalArgumentException e) {
                         fileUriStr = target;
                     }
+                    
                     startRecordingAudio(target, FileHelper.stripFileProtocol(fileUriStr));
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -99,7 +101,10 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     stopRecordingAudio(target);
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -119,7 +124,9 @@ public class AudioHandler extends CordovaPlugin {
                     }
                     
                     startPlayingAudio(id, FileHelper.stripFileProtocol(fileUriStr));
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -131,7 +138,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     seekToAudio(id, position);
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -142,7 +151,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     pausePlayingAudio(id);
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -153,7 +164,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     stopPlayingAudio(id);
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -169,7 +182,9 @@ public class AudioHandler extends CordovaPlugin {
                     } catch (NumberFormatException nfe) {
                         //no-op
                     }
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -180,7 +195,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     float f = getCurrentPositionAudio(id);
-                    callbackContext.sendPluginResult(new PluginResult(status, f));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, f);
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -192,7 +209,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     float f = getDurationAudio(id, secondArg);
-                    callbackContext.sendPluginResult(new PluginResult(status, f));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, f);
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -205,7 +224,9 @@ public class AudioHandler extends CordovaPlugin {
                 public void run() {
                     String src = FileHelper.stripFileProtocol(secondArg);
                     getOrCreatePlayer(id, src);
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -216,7 +237,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     boolean b = release(id);
-                    callbackContext.sendPluginResult(new PluginResult(status, b));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, b);
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
@@ -226,7 +249,9 @@ public class AudioHandler extends CordovaPlugin {
                 @Override
                 public void run() {
                     messageChannel = callbackContext;
-                    callbackContext.sendPluginResult(new PluginResult(status, result));
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
                 }
             });
             return true;
