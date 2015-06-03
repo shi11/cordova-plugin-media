@@ -256,7 +256,7 @@ public class AudioHandler extends CordovaPlugin {
             });
             return true;
         }
-        else if (action.equals("onReset")) {
+        else if (action.equals("resetAll")) {
             cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
