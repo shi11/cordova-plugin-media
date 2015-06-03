@@ -256,6 +256,18 @@ public class AudioHandler extends CordovaPlugin {
             });
             return true;
         }
+        else if (action.equals("onReset")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    onDestroy();
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
+                }
+            });
+            return true;
+        }
         else { // Unrecognized action.
             return false;
         }
