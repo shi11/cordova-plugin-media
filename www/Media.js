@@ -174,7 +174,7 @@ Media.prototype.setLockScreenInfo = function(title, album, artist, pathToCover, 
 /**
  * Destroy & Release the resources for all audio files.
  */
-Media.prototype.resetAudio = function() {
+Media.resetAudio = function() {
     exec(null, this.errorCallback, "Media", "onReset");
 };
 
