@@ -282,16 +282,39 @@
 -(void) playEvent: (MPRemoteCommandEvent *) remoteEvent
 {
     if (nowPlayingId) {
-        //NSLog(@"Play - Remote Event");
-        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 10];
+
+        NSString* jsString = nil;
+        CDVAudioFile* audioFile = [[self soundCache] objectForKey:nowPlayingId];
+
+        if (audioFile != nil && audioFile.player != nil) {
+            if (audioFile.player != nil) {
+                [audioFile.player play];
+            }
+            NSLog(@"Resumed playing audio sample '%@'", audioFile.resourcePath);
+
+            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 10];
+        }
+        
         [self.commandDelegate evalJs:jsString];
     }
 }
 
 -(void) pauseEvent: (MPRemoteCommandEvent *) remoteEvent
-{   if (nowPlayingId) {
-        //NSLog(@"Paused - Remote Event");
-        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 11];
+{   
+    if (nowPlayingId) {
+
+        NSString* jsString = nil;
+        CDVAudioFile* audioFile = [[self soundCache] objectForKey:nowPlayingId];
+
+        if (audioFile != nil && audioFile.player != nil) {
+            if (audioFile.player != nil) {
+                [audioFile.player pause];
+            }
+            NSLog(@"Paused playing audio sample '%@'", audioFile.resourcePath);
+
+            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 11];
+        }
+        
         [self.commandDelegate evalJs:jsString];
     }
 }
@@ -388,15 +411,24 @@
                     if (audioFile.volume != nil) {
                         audioFile.player.volume = [audioFile.volume floatValue];
                     }
+
                     [audioFile.player play];
+                    
+                    // option to preload track
+                    NSNumber* preloadAudio = [options objectForKey:@"preloadAudio"];
+                    if (preloadAudio) {
+                        [audioFile.player pause];
+                    }
                     position = audioFile.player.currentTime;    
                 }
 
+                // Lockscreen Playback Info
                 position = round(position * 1000) / 1000;
                 MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
                 NSMutableDictionary *playingInfo = [NSMutableDictionary dictionaryWithDictionary:center.nowPlayingInfo];
                 [playingInfo setObject:[NSNumber numberWithFloat:position] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
                 center.nowPlayingInfo = playingInfo;
+
                 jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_DURATION, position, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_RUNNING];
                 [self.commandDelegate evalJs:jsString];
             }
