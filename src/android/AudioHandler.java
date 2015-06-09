@@ -110,10 +110,8 @@ public class AudioHandler extends CordovaPlugin {
             return true;
         }
         else if (action.equals("startPlayingAudio")) {
-            final String id = args.getString(0);
             final String target = args.getString(1);
-            final Boolean preload = args.getString(2) || false;
-
+            final String id = args.getString(0);
             cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -125,7 +123,7 @@ public class AudioHandler extends CordovaPlugin {
                         fileUriStr = target;
                     }
                     
-                    startPlayingAudio(id, FileHelper.stripFileProtocol(fileUriStr), preload);
+                    startPlayingAudio(id, FileHelper.stripFileProtocol(fileUriStr));
                     PluginResult result = new PluginResult(PluginResult.Status.OK, "");
                     result.setKeepCallback(true);
                     callbackContext.sendPluginResult(result);
@@ -324,7 +322,7 @@ public class AudioHandler extends CordovaPlugin {
             // If phone idle, then resume playing those players we paused
             else if ("idle".equals(data)) {
                 for (AudioPlayer audio : this.pausedForPhone) {
-                    audio.startPlaying(null, null);
+                    audio.startPlaying(null);
                 }
                 this.pausedForPhone.clear();
             }
@@ -390,9 +388,9 @@ public class AudioHandler extends CordovaPlugin {
      * @param id                The id of the audio player
      * @param file              The name of the audio file.
      */
-    public void startPlayingAudio(String id, String file, Boolean preload) {
+    public void startPlayingAudio(String id, String file) {
         AudioPlayer audio = getOrCreatePlayer(id, file);
-        audio.startPlaying(file, preload);
+        audio.startPlaying(file);
     }
 
     /**

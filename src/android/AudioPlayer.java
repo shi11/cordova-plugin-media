@@ -213,14 +213,11 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      *
      * @param file              The name of the audio file.
      */
-    public void startPlaying(String file, Boolean preload) {
+    public void startPlaying(String file) {
         if (this.readyPlayer(file) && this.player != null) {
             this.player.start();
             this.setState(STATE.MEDIA_RUNNING);
             this.seekOnPrepared = 0; //insures this is always reset
-            if (preload) {
-                this.player.pause();
-            }
         } else {
             this.prepareOnly = false;
         }

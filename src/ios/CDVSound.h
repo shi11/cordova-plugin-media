@@ -88,6 +88,12 @@ typedef NSUInteger CDVMediaMsg;
     AVAudioSession* avSession;
     BOOL isBeginReceiveRemoteControlsSet;
     AVPlayer* avPlayer;
+    AVPlayer* avPlayer1;
+    AVPlayer* avPlayer2;
+    AVPlayer* avPlayer3;
+    NSString* avPlayer1Id;
+    NSString* avPlayer2Id;
+    NSString* avPlayer3Id;
 }
 @property (nonatomic, strong) NSMutableDictionary* soundCache;
 @property (nonatomic, strong) AVAudioSession* avSession;
@@ -101,6 +107,7 @@ typedef NSUInteger CDVMediaMsg;
 - (void)release:(CDVInvokedUrlCommand*)command;
 - (void)getCurrentPositionAudio:(CDVInvokedUrlCommand*)command;
 - (void)setLockScreenInfo:(CDVInvokedUrlCommand*)command;
+- (void)resetAll:(CDVInvokedUrlCommand*)command;
 
 - (BOOL)hasAudioSession;
 
