@@ -1,4 +1,4 @@
-cordova.define("cordova-plugin-media.Media", function(require, exports, module) { /*
+/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -220,7 +220,6 @@ Media.onStatus = function(id, msgType, value) {
 
 
 module.exports = Media;
-               
 
 function onMessageFromNative(msg) {
     if (msg.action == 'status') {
@@ -242,5 +241,3 @@ if (cordova.platformId === 'android' || cordova.platformId === 'amazon-fireos' |
         channel.initializationComplete('onMediaPluginReady');
     });
 }
-
-});
