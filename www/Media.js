@@ -1,4 +1,4 @@
-/*
+cordova.define("cordova-plugin-media.Media", function(require, exports, module) { /*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -48,10 +48,6 @@ var Media = function(src, successCallback, errorCallback, statusCallback) {
     this._duration = -1;
     this._position = -1;
     exec(null, this.errorCallback, "Media", "create", [this.id, this.src]);
-};
-
-var MediaPlugin = function() {
-
 };
 
 // Media messages
@@ -178,7 +174,7 @@ Media.prototype.setLockScreenInfo = function(title, album, artist, pathToCover, 
 /**
  * Destroy & Release the resources for all audio files.
  */
-MediaPlugin.resetAll = function() {
+Media.resetAll = function() {
     exec(null, this.errorCallback, "Media", "resetAll");
 };
 
@@ -224,7 +220,7 @@ Media.onStatus = function(id, msgType, value) {
 
 
 module.exports = Media;
-module.exports = MediaPlugin;
+               
 
 function onMessageFromNative(msg) {
     if (msg.action == 'status') {
@@ -246,3 +242,5 @@ if (cordova.platformId === 'android' || cordova.platformId === 'amazon-fireos' |
         channel.initializationComplete('onMediaPluginReady');
     });
 }
+
+});
