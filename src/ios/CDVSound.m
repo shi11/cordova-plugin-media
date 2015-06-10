@@ -978,6 +978,10 @@
         avPlayer3 = nil;
         avPlayer3Id = nil;
         
+        if (avPlayer != nil) {
+            [avPlayer pause];
+        }
+        
         if (self.avSession) {
             [self.avSession setActive:NO error:nil];
         }
@@ -985,6 +989,8 @@
         [[self soundCache] removeAllObjects];
         [self setSoundCache:nil];
         [self setAvSession:nil];
+
+        NSLog(@"Plugin Reset");
     }];
 }
 
