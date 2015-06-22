@@ -748,7 +748,6 @@
             
             /* for local files: NSString *currentpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
              currentpath = [NSString stringWithFormat:@"%@/files/%@", currentpath, pathToCover];
-             
              UIImage *albumArtImage = [UIImage imageWithContentsOfFile:pathToCover]; */
             
             // for urls
@@ -977,7 +976,7 @@
         avPlayer2Id = nil;
         avPlayer3 = nil;
         avPlayer3Id = nil;
-        
+
         if (avPlayer != nil) {
             [avPlayer pause];
         }

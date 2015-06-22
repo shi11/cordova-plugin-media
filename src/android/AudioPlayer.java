@@ -58,6 +58,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
                       };
 
     private static final String LOG_TAG = "AudioPlayer";
+    private static final String shouldPreload = "preload";
 
     // AudioPlayer message ids
     private static int MEDIA_STATE = 1;
@@ -85,6 +86,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 
     private MediaPlayer player = null;      // Audio player object
     private boolean prepareOnly = true;     // playback after file prepare flag
+    private boolean preloadOnly = false;      // preload after file prepare flag
     private int seekOnPrepared = 0;     // seek to this location once media is prepared
 
     /**
@@ -213,16 +215,21 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      *
      * @param file              The name of the audio file.
      */
-    public void startPlaying(String file) {
+    public void startPlaying(String file, String preload) {
         if (this.readyPlayer(file) && this.player != null) {
             this.player.start();
             this.setState(STATE.MEDIA_RUNNING);
             this.seekOnPrepared = 0; //insures this is always reset
         } else {
             this.prepareOnly = false;
+            this.preloadOnly = shouldPreload.equals(preload);
+        }
+        
+        if (shouldPreload.equals(preload)) {
+            this.player.pause();
         }
     }
-
+    
     /**
      * Seek or jump to a new time in the track.
      */
@@ -334,7 +341,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
         // If no player yet, then create one
         else {
             this.prepareOnly = true;
-            this.startPlaying(file);
+            this.startPlaying(file, null);
 
             // This will only return value for local, since streaming
             // file hasn't been read yet.
@@ -360,6 +367,14 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
         } else {
             this.setState(STATE.MEDIA_STARTING);
         }
+        
+        // should just preload?
+        if (this.preloadOnly) {
+            this.preloadOnly = false;
+            this.player.pause();
+        }
+            
+            
         // Save off duration
         this.duration = getDurationInSeconds();
         // reset prepare only flag
