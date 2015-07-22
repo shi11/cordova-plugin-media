@@ -253,6 +253,8 @@
                     avPlayer3 = [[AVPlayer alloc] initWithPlayerItem:playerItem];
                     avPlayer2Id = mediaId;
                 }
+
+                [avPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
                 
                 //avPlayer = [[AVPlayer alloc] initWithURL:resourceUrl];
             }
@@ -263,6 +265,27 @@
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         }
     }];
+}
+
+/**
+* loads the stream faster
+**/
+- (void) observeValueForKeyPath:(NSString *)keyPath
+                       ofObject:(id)object
+                         change:(NSDictionary  *)change
+                        context:(void *)context {
+
+    if (object == avPlayer && [keyPath isEqualToString:@"status"]) {
+        if (avPlayer.status == AVPlayerStatusReadyToPlay) {
+            //Audio session is set to allow streaming in background
+            AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+            [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+            [avPlayer play];
+        }
+        if (avPlayer.status == AVPlayerStatusFailed) {
+            NSLog(@"Something went wrong: %@", avPlayer.error);
+        }
+    }
 }
 
 - (void)setVolume:(CDVInvokedUrlCommand*)command
