@@ -242,18 +242,9 @@
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
                 
                 // Pass the AVPlayerItem to a new player
-                
-                if (avPlayer1Id == nil) {
-                    avPlayer1 = [[AVPlayer alloc] initWithPlayerItem:playerItem];
-                    avPlayer1Id = mediaId;
-                } else if (avPlayer2Id == nil) {
-                    avPlayer2 = [[AVPlayer alloc] initWithPlayerItem:playerItem];
-                    avPlayer2Id = mediaId;
-                } else if (avPlayer3Id == nil) {
-                    avPlayer3 = [[AVPlayer alloc] initWithPlayerItem:playerItem];
-                    avPlayer2Id = mediaId;
-                }
-
+                avPlayer = [[AVPlayer alloc] initWithPlayerItem:playerItem];
+            
+                //observe status
                 [avPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
                 
                 //avPlayer = [[AVPlayer alloc] initWithURL:resourceUrl];
@@ -275,7 +266,7 @@
                          change:(NSDictionary  *)change
                         context:(void *)context {
 
-    if (object == avPlayer && [keyPath isEqualToString:@"status"]) {
+    if ([keyPath isEqualToString:@"status"]) {
         if (avPlayer.status == AVPlayerStatusReadyToPlay) {
             //Audio session is set to allow streaming in background
             AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -398,10 +389,8 @@
         NSString* jsString = nil;
         
         // check status of all AVPlayers
-        NSLog(@"AVPlayer 1 Status '%@'", avPlayer1Id);
-        NSLog(@"AVPlayer 2 Status '%@'", avPlayer2Id);
-        NSLog(@"AVPlayer 3 Status '%@'", avPlayer3Id);
-        
+        NSLog(@"AVPlayer Status '%@'", avPlayerId);
+ 
         CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
         if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
             if (audioFile.player == nil) {
@@ -438,14 +427,6 @@
                     // Main Player (NowPlaying)
                     if (preloadAudio == nil) {
                         
-                        if ([avPlayer1Id isEqualToString:mediaId]) {
-                            avPlayer = avPlayer1;
-                        } else if ([avPlayer2Id isEqualToString:mediaId]) {
-                            avPlayer = avPlayer2;
-                        } else if ([avPlayer3Id isEqualToString:mediaId]) {
-                            avPlayer = avPlayer3;
-                        }
-                        
                         if (avPlayer) {
                             CMTime time = [avPlayer currentTime];
                             position = CMTimeGetSeconds(time);
@@ -460,18 +441,6 @@
                         [playingInfo setObject:[NSNumber numberWithFloat:position] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
                         center.nowPlayingInfo = playingInfo;
                     
-                    // Preload Other Players
-                    } else {
-                        if ([avPlayer1Id isEqualToString:mediaId]) {
-                            [avPlayer1 play];
-                            [avPlayer1 pause];
-                        } else if ([avPlayer2Id isEqualToString:mediaId]) {
-                            [avPlayer2 play];
-                            [avPlayer2 pause];
-                        } else if ([avPlayer3Id isEqualToString:mediaId]) {
-                            [avPlayer3 play];
-                            [avPlayer3 pause];
-                        }
                     }
                     
                     jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%.3f);\n%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_DURATION, position, @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_RUNNING];
@@ -681,17 +650,10 @@
                     //self.avSession = nil;
                 }
                 
-                // clear reference to single AVPlayer
-                if ([avPlayer1Id isEqualToString:mediaId]) {
-                    avPlayer1Id = nil;
-                    avPlayer1 = nil;
-                } else if ([avPlayer2Id isEqualToString:mediaId]) {
-                    avPlayer2Id = nil;
-                    avPlayer2 = nil;
-                } else if ([avPlayer3Id isEqualToString:mediaId]) {
-                    avPlayer3Id = nil;
-                    avPlayer3 = nil;
-                }
+                //clear player
+                [avPlayer removeObserver:self forKeyPath:@"status"];
+                avPlayer = nil;
+                avPlayerId = nil;
                 
                 [[self soundCache] removeObjectForKey:mediaId];
                 NSLog(@"Media with id %@ released", mediaId);
@@ -993,16 +955,11 @@
 - (void)resetAll:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
-        avPlayer1 = nil;
-        avPlayer1Id = nil;
-        avPlayer2 = nil;
-        avPlayer2Id = nil;
-        avPlayer3 = nil;
-        avPlayer3Id = nil;
-
         if (avPlayer != nil) {
             [avPlayer pause];
         }
+        avPlayer = nil;
+        avPlayerId = nil;
         
         if (self.avSession) {
             [self.avSession setActive:NO error:nil];
