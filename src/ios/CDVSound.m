@@ -240,7 +240,12 @@
                 
                 // Subscribe to the AVPlayerItem's DidPlayToEndTime notification.
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
-                
+
+                //remove observer if exists
+                if (avPlayer != nil)
+                [avPlayer removeObserver:self forKeyPath:@"status"];
+
+
                 // Pass the AVPlayerItem to a new player
                 avPlayer = [[AVPlayer alloc] initWithPlayerItem:playerItem];
             
