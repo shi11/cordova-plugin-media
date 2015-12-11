@@ -225,7 +225,8 @@
         
         NSString* mediaId = [command argumentAtIndex:0];
         NSString* resourcePath = [command argumentAtIndex:1];
-        
+        NSString* jsString = nil;
+
         CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:NO forRecording:NO];
         
         if (audioFile == nil) {
@@ -253,6 +254,12 @@
                 [avPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
                 
                 //avPlayer = [[AVPlayer alloc] initWithURL:resourceUrl];
+
+                jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STARTING];
+                if (jsString) {
+                    [self.commandDelegate evalJs:jsString];
+                }
+
             }
             
             self.currMediaId = mediaId;
