@@ -100,8 +100,10 @@ Media.prototype.seekTo = function(milliseconds) {
 /**
  * Pause playing audio file.
  */
-Media.prototype.pause = function() {
-    exec(null, this.errorCallback, "Media", "pausePlayingAudio", [this.id]);
+Media.prototype.toggle = function() {
+//Media.prototype.pause = function() {
+    exec(null, this.errorCallback, "Media", "togglePlayingAudio", [this.id]);
+    //exec(null, this.errorCallback, "Media", "pausePlayingAudio", [this.id]);
 };
 
 /**

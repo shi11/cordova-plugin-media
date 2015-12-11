@@ -326,29 +326,40 @@
     }
 }
 
--(void) pauseEvent: (MPRemoteCommandEvent *) remoteEvent
+- (void)togglePlayingAudio:(CDVInvokedUrlCommand*)command
+//- (void)pausePlayingAudio:(CDVInvokedUrlCommand*)command
 {
-    if (nowPlayingId != nil) {
-        
+    [self.commandDelegate runInBackground:^{
+        NSString* mediaId = [command argumentAtIndex:0];
         NSString* jsString = nil;
-        CDVAudioFile* audioFile = [[self soundCache] objectForKey:nowPlayingId];
-        if (audioFile != nil && ((audioFile.player != nil) || (avPlayer != nil))) {
+        CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+
+        if ( (audioFile != nil && audioFile.player != nil) || (avPlayer != nil) ) {
             if (audioFile.player != nil) {
                 [audioFile.player pause];
             }
             if (avPlayer != nil) {
-                [avPlayer pause];
+                if (avPlayer.rate == 1.0) {
+                    [avPlayer pause];
+                    NSLog(@"Paused playing audio sample '%@'", audioFile.resourcePath);
+
+                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_PAUSED];
+                } else {
+                    [avPlayer play];
+                    jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_RUNNING];
+                }
+                //[avPlayer pause];
             }
-            NSLog(@"Paused from remote audio sample '%@'", audioFile.resourcePath);
-            
-            jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", nowPlayingId, MEDIA_STATE, 11];
+
         }
         // ignore if no media playing
+
         if (jsString) {
             [self.commandDelegate evalJs:jsString];
         }
-    }
+    }];
 }
+
 
 
 -(void) nextTrackEvent: (MPRemoteCommandEvent *) remoteEvent
