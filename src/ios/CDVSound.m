@@ -652,6 +652,7 @@
 {
     [self.commandDelegate runInBackground:^{
         NSString* mediaId = [command argumentAtIndex:0];
+        NSString* jsString;
         
         if (mediaId != nil) {
             CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
@@ -680,6 +681,9 @@
                 
                 [[self soundCache] removeObjectForKey:mediaId];
                 NSLog(@"Media with id %@ released", mediaId);
+                
+                jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STOPPED];
+                [self.commandDelegate evalJs:jsString];
             }
         }
     }];
